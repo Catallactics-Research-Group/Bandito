@@ -3,6 +3,28 @@ module Bandito
 
 using Random
 
+
+struct Bandit
+    k::Int                  # Number of arms (usually 10)
+    q_star::Vector{Float64} # True action values
+end
+
+function Bandit(k::Int=10)
+    # "The true value q*(a) of each of the ten actions was selected
+    # according to a normal distribution with mean zero and unit variance"
+    q_star = randn(k)
+    return Bandit(k, q_star)
+end
+
+function step(bandit::Bandit, action::Int)
+    # "The actual reward, Rt, was selected from a normal distribution
+    # with mean q*(At) and variance 1"
+    true_value = bandit.q_star[action]
+    reward = true_value + randn()
+    return reward
+end
+
+
 abstract type AbstractBanditAgent end
 
 mutable struct EpsilonGreedyAgent <: AbstractBanditAgent
@@ -36,7 +58,7 @@ function update!(agent::EpsilonGreedyAgent, action::Int, reward::Float64)
 end
 
 
-function run_one_experiment(agent::AbstractBanditAgent, steps::Int, seed::Union{Nothing, Int}=nothing)
+function run_experiment(agent::AbstractBanditAgent, steps::Int, seed::Union{Nothing, Int}=nothing)
     if seed !== nothing
         Random.seed!(seed)
     end

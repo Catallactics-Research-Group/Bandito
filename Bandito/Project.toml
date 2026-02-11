@@ -2,3 +2,9 @@ name = "Bandito"
 uuid = "82fe7461-2ade-47b6-8040-ab097e6b4527"
 version = "0.1.0"
 authors = ["Tyler Brough <broughtj@gmail.com>"]
+
+[deps]
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
+[compat]
+Random = "1.11.0"
