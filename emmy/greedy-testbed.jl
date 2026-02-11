@@ -147,3 +147,5 @@ for i in 1:10
 
     println("   $i   |   $true_val   |       $est_val      |      $count")
 end
+
+# try gemini suggestion for cleaning up reward get rid of inner loop, also figure out how to plot 
