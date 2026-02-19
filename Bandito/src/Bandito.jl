@@ -143,9 +143,9 @@ end
 # Then it returns a Dict Name of agent with its rewards adn optimal picks.
 function run_simulation(
     agents::Dict{String, Function};
-    n_runs::Int,
-    steps::Int,
-    seed::Union{Nothing, Int}=nothing
+    n_runs,
+    steps,
+    seed
 )
     results = Dict{String, NamedTuple}()
 
@@ -183,7 +183,7 @@ function run_simulation(
         n_runs::Int,
         steps::Int,
         k_arms::Int = 10,
-        seed::Union{Nothing, Int}=nothing
+        seed=nothing
         )
     
     agents = Dict(
@@ -199,7 +199,7 @@ function run_ucb_simulation(
         n_runs::Int,
         steps::Int,
         k_arms::Int = 10,
-        seed::Union{Nothing, Int}=nothing
+        seed=nothing
         )
     
     agents = Dict(
@@ -216,7 +216,7 @@ function run_comparison(
         n_runs::Int,
         steps::Int,
         k_arms::Int = 10,
-        seed::Union{Nothing, Int}=nothing
+        seed=nothing
         )
 
     agents = Dict(
