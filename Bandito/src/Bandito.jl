@@ -142,7 +142,7 @@ end
 # This function will run the simulation by passing in a Dict mapping a name to an agent (new fresh agent)
 # Then it returns a Dict Name of agent with its rewards adn optimal picks.
 function run_simulation(
-    agents::Dict{String, Function};
+    agents;
     n_runs,
     steps,
     seed
@@ -188,10 +188,12 @@ function run_simulation(
     
     agents = Dict(
         "EpsilonGreedy (epsilon=$(epsilon))" => () -> EpsilonGreedyAgent(k_arms, epsilon)
-        )
+    )
     
     return run_simulation(agents; n_runs=n_runs, steps=steps, seed=seed)
 end
+
+
 
 # Wrapper for UCB Agent only
 function run_ucb_simulation(
