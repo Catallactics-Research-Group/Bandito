@@ -2,7 +2,7 @@ module Bandito
 
 # Dependencies and Libraries
 using Random
-using statistics
+using Statistics
 
 # Environment
 struct Bandit
