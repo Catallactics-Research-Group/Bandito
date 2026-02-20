@@ -224,8 +224,7 @@ function run_comparison(
 
     agents = Dict(
         "EpsilonGreedy (epsilon=$(epsilon))" => () -> EpsilonGreedyAgent(k_arms, epsilon),
-        "UCB (c=$(c))" => () -> UCBAgent(k_arms, c),
-        "E_G" => () -> EpsilonGreedyAgent(optimal)
+        "UCB (c=$(c))" => () -> UCBAgent(k_arms, c)
         )
 
      return run_simulation(agents; n_runs=n_runs, steps=steps, seed=seed)
