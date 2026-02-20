@@ -143,9 +143,9 @@ end
 # Then it returns a Dict Name of agent with its rewards adn optimal picks.
 function run_simulation(
     agents;
-    n_runs,
-    steps,
-    seed
+    n_runs::Int,
+    steps::Int,
+    seed=nothing
 )
     results = Dict{String, NamedTuple}()
 
