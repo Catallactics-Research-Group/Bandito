@@ -120,10 +120,10 @@ function run_experiment(agent::AbstractBanditAgent, steps::Int, seed::Union{Noth
     rewards = zeros(Float64, steps)
     optimal_picks = zeros(Float64, steps)
 
-    for t in 1:steps
-        # UCB uses time, but previous epsilon_greedy did not
+    for step_idx in 1:steps
+        # UCB uses time, but previous epsilon_greedy does not
         if hasproperty(agent, :t)
-            setfield!(agent, :t, getfield(agent, :t) + 1)
+            agent.t += 1
         end
         
         action = select(agent)       # Julia dispatches to the correct select method
@@ -223,7 +223,8 @@ function run_comparison(
 
     agents = Dict(
         "EpsilonGreedy (epsilon=$(epsilon))" => () -> EpsilonGreedyAgent(k_arms, epsilon),
-        "UCB (c=$(c))" => () -> UCBAgent(k_arms, c)
+        "UCB (c=$(c))" => () -> UCBAgent(k_arms, c),
+        "E_G" => () -> EpsilonGreedyAgent(optimal)
         )
 
      return run_simulation(agents; n_runs=n_runs, steps=steps, seed=seed)
