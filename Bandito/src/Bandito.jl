@@ -130,11 +130,11 @@ function run_experiment(agent::AbstractBanditAgent, steps::Int, seed::Union{Noth
         action = select(agent)       # Julia dispatches to the correct select method
         reward = step(env, action)
         update!(agent, action, reward) # Julia dispatches to the correct update! method
-        rewards[t] = reward
+        rewards[step_idx] = reward
         if action == optimal_action
-            optimal_picks[t] = 1.0
+            optimal_picks[step_idx] = 1.0
         else
-            optimal_picks[t] = 0.0
+            optimal_picks[step_idx] = 0.0
         end
     end
     return rewards, optimal_picks
@@ -225,7 +225,7 @@ function run_comparison(
     agents = Dict(
         "EpsilonGreedy (epsilon=$(epsilon))" => () -> EpsilonGreedyAgent(k_arms, epsilon),
         "UCB (c=$(c))" => () -> UCBAgent(k_arms, c)
-        )
+    )
 
      return run_simulation(agents; n_runs=n_runs, steps=steps, seed=seed)
 end
@@ -258,7 +258,7 @@ function plot_optimal_action(results; as_percent=true, title="Optimal Action", x
 
     ylabel = as_percent ? "% optimal action" : "P(optimal action)"
     
-    plt = Plots.plot(title=title, xlabel=xlabel, ylable=ylabel)
+    plt = Plots.plot(title=title, xlabel=xlabel, ylabel=ylabel)
     for (name, res) in results
         y = as_percent ? 100 .* res.optimal : res.optimal
         Plots.plot!(plt, y, label=name)
@@ -269,7 +269,7 @@ end
 # Make both of the above plots and return them for easier cmd line calls
 # We can add to this if we include additional plots as well
 function plot_summary(results)
-    p1 = plot_avg_rewards(results)
+    p1 = plot_avg_reward(results)
     p2 = plot_optimal_action(results)
     return p1, p2
 end
