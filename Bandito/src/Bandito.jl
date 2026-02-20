@@ -141,7 +141,7 @@ function run_experiment(agent::AbstractBanditAgent, steps::Int, seed::Union{Noth
 end
 
 # This function will run the simulation by passing in a Dict mapping a name to an agent (new fresh agent)
-# Then it returns a Dict Name of agent with its rewards adn optimal picks.
+# Then it returns a Dict Name of agent with its rewards and optimal picks.
 function run_simulation(
     agents;
     n_runs::Int,
