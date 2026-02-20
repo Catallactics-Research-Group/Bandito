@@ -3,6 +3,7 @@ module Bandito
 # Dependencies and Libraries
 using Random
 using Statistics
+using Plots
 
 # Environment
 struct Bandit
@@ -238,13 +239,10 @@ end
 
 function plot_avg_reward(results; title="Average Reward Over Time",
         xlabel="Step/Time", ylabel="Average Reward")
-    @eval begin
-        import Plots
-    end
 
-    plt = Plots.plot(title=title, xlabel=xlabel, ylable=ylabel)
+    plt = plot(title=title, xlabel=xlabel, ylabel=ylabel)
     for (name, res) in results
-        Plots.plot!(plt, res.rewards, label=name)
+        plot!(plt, res.rewards, label=name)
     end
     return plt
 end
@@ -252,16 +250,13 @@ end
 # Percent optimal action over time for one or more agents
 # Values of [0,1], but we can do percent as well
 function plot_optimal_action(results; as_percent=true, title="Optimal Action", xlabel="Step/Time")
-    @eval begin
-        import Plots
-    end
 
     ylabel = as_percent ? "% optimal action" : "P(optimal action)"
     
-    plt = Plots.plot(title=title, xlabel=xlabel, ylabel=ylabel)
+    plt = plot(title=title, xlabel=xlabel, ylabel=ylabel)
     for (name, res) in results
         y = as_percent ? 100 .* res.optimal : res.optimal
-        Plots.plot!(plt, y, label=name)
+        plot!(plt, y, label=name)
     end
     return plt
 end
