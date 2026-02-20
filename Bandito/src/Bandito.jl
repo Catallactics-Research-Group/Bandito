@@ -2,6 +2,7 @@ module Bandito
 
 # Dependencies and Libraries
 using Random
+using statistics
 
 # Environment
 struct Bandit
@@ -230,4 +231,47 @@ function run_comparison(
      return run_simulation(agents; n_runs=n_runs, steps=steps, seed=seed)
 end
 
+
+# Optional Plotting features
+
+# Average reward over time for one or more agents
+# In each results is the Dictionary return by our simulation and comparison functions
+
+function plot_avg_reward(results; title="Average Reward Over Time",
+        xlabel="Step/Time", ylabel="Average Reward")
+    @eval begin
+        import Plots
+    end
+
+    plt = Plots.plot(title=title, xlabel=xlabel, ylable=ylabel)
+    for (name, res) in results
+        Plots.plot!(plt, res.rewards, label=name)
+    end
+    return plt
+end
+
+# Percent optimal action over time for one or more agents
+# Values of [0,1], but we can do percent as well
+function plot_optimal_action(results; as_percent=true, title="Optimal Action", xlabel="Step/Time", ylabel="as_percent ? "% optimal action" : "P(optimal action)"")
+    @eval begin
+        import Plots
+    end
+
+    plt = Plots.plot(title=title, xlabel=xlabel, ylable=ylabel)
+    for (name, res) in results
+        y = as_percent ? 100 .* res.optimal : res.optimal
+        Plots.plot!(plt, y, label=name)
+    end
+    return plt
+end
+
+# Make both of the above plots and return them for easier cmd line calls
+# We can add to this if we include additional plots as well
+function plot_summary(results)
+    p1 = plot_avg_rewards(results)
+    p2 = plot_optimal_action(results)
+    return p1, p2
+end
+
+    
 end # module Bandito
