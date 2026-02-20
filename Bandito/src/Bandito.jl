@@ -252,11 +252,13 @@ end
 
 # Percent optimal action over time for one or more agents
 # Values of [0,1], but we can do percent as well
-function plot_optimal_action(results; as_percent=true, title="Optimal Action", xlabel="Step/Time", ylabel="as_percent ? "% optimal action" : "P(optimal action)"")
+function plot_optimal_action(results; as_percent=true, title="Optimal Action", xlabel="Step/Time")
     @eval begin
         import Plots
     end
 
+    ylabel = as_percent ? "% optimal action" : "P(optimal action)"
+    
     plt = Plots.plot(title=title, xlabel=xlabel, ylable=ylabel)
     for (name, res) in results
         y = as_percent ? 100 .* res.optimal : res.optimal
