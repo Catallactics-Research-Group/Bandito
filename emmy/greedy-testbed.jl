@@ -33,6 +33,8 @@ end
     epsilon::Float64 # exploration generate
 end
 
+@component struct UCB
+
 @component struct ArmID
     id::Int
 end
@@ -119,11 +121,11 @@ for i in 1:10
 end
 
 # Loopdyloop
-println("hold on to yon butts...")
+println("somethings a brewin'...")
 for t in 1:1000
     update(l)
 end
-println("done. chyah.")
+println("done.")
 
 # Get the agent entity (assuming it's the first one with a LearnerState)
 agent = first(@entities_in(l, LearnerState))
