@@ -1,9 +1,9 @@
 
 using Overseer
+using Plots
 
 #---------- Component Layer -----------
 #
-
 
 @component struct Arm
     true_mean::Float64 # true reward
@@ -30,6 +30,9 @@ end
 
 @component struct UCB
     c::Float64
+end
+
+@component struct ThompsonSampling
 end
 
 @component mutable struct ActionScores
@@ -105,6 +108,7 @@ end
 
 struct UCBScorer <: System end
 struct EpsilonGreedyScorer <: System end
+struct ThompsonSamplingScorer <: System end
 
 function Overseer.update(::UCBScorer, l::AbstractLedger)
     # Only runs for entities tagged with UCB
@@ -137,74 +141,117 @@ function Overseer.update(::EpsilonGreedyScorer, l::AbstractLedger)
     end
 end
 
-
-    # ---------- Simulation stage ---------
-    #
-
-    sim_stage = Stage(:execution, [
-        UCBScorer(),
-        EpsilonGreedyScorer(),
-        DecisionSystem(),
-        RewardSystem(),
-        LearningSystem(),
-        RecordingSystem()
-    ])
-
-    l = Ledger(sim_stage)
-
-    for i in 1:10
-        Entity(l, Arm(randn()), ArmID(i))
-    end
-
-    # The UCB Agent
-    Entity(l,
-        UCB(2.0),
-        LearnerState(zeros(10), zeros(Int, 10)),
-        ActionScores(zeros(10)),
-        RecentAction(0, 0.0),
-        History(Int[], Float64[])
-    )
-
-    # The Epsilon-Greedy Agent
-    Entity(l,
-        EpsilonGreedy(0.1),
-        LearnerState(zeros(10), zeros(Int, 10)),
-        ActionScores(zeros(10)),
-        RecentAction(0, 0.0),
-        History(Int[], Float64[])
-    )
-
-    println("Running simulation...")
-    # official loopdy loop
-    for t in 1:1000
-        update(l)
-    end
-
-    # To visualize:
-    for agent in @entities_in(l, History && (UCB || EpsilonGreedy))
-        strategy_name = UCB in agent ? "UCB" : "Epsilon-Greedy"
-        println("Strategy: $strategy_name | Total Reward: $(sum(agent.rewards))")
-    end
-
-
-    # ------- Plots -------
-    using Plots
-
-    # Helper to get cumulative rewards
-    function get_cumulative_rewards(ledger)
-        p = plot(title="Bandit Strategy Comparison", xlabel="Steps", ylabel="Cumulative Reward")
-
-        for e in @entities_in(ledger, History && (UCB || EpsilonGreedy))
-            label = UCB in e ? "UCB (c=$(e.c))" : "EpsilonGreedy (ε=$(e.epsilon))"
-
-            # cumsum turns [1, 2, 3] into [1, 3, 6]
-            cumulative_r = cumsum(e.rewards)
-
-            plot!(p, cumulative_r, label=label)
+function Overseer.update(::ThompsonSamplingScorer, l::AbstractLedger)
+    for e in @entities_in(l, LearnerState && ThompsonSampling && ActionScores)
+        for i in eachindex(e.scores)
+            if e.N[i]==0
+                e.scores[i] = 1e10
+            else
+                standard_deviation = 1.0/sqrt(e.N[i])
+                e.scores[i] = e.Q[i] + (standard_deviation * randn())
+            end
         end
-        return p
     end
+end
 
-    # Display the plot
-    display(get_cumulative_rewards(l))
-    
+# ---------- Simulation stage ---------
+#
+
+sim_stage = Stage(:execution, [
+    UCBScorer(),
+    EpsilonGreedyScorer(),
+    ThompsonSamplingScorer(),
+    DecisionSystem(),
+    RewardSystem(),
+    LearningSystem(),
+    RecordingSystem()
+])
+
+
+
+
+# ------------- testbed function -------------
+
+function run_testbed(strategies, T=1000, N=2000)
+    # matrix with rows = time and cols = strategies
+    n_strats = length(strategies)
+    avg_rewards = zeros(T, n_strats) # running average
+    optimal_line = zeros(T)
+    println("running testbed ...")
+
+    for j in 1:N
+        if j % 100 == 0
+            println("  > Completed Run $j / $N...")
+        end
+        # New ledger and new arms -- fresh problem
+        l = Ledger(sim_stage)
+
+        # set up new arms
+        true_means = randn(10)
+        best_mean = maximum(true_means)
+        for i in 1:10
+            Entity(l, Arm(true_means[i]), ArmID(i))
+        end
+
+        # spawn agents with chosen strategies
+        agent_ids = []
+        for strat in strategies
+            # create an agent for each strategy
+            id = Entity(l,
+                strat,
+                LearnerState(zeros(10), zeros(Int, 10)),
+                ActionScores(zeros(10)),
+                RecentAction(0, 0.0))
+            push!(agent_ids, id)
+        end
+
+        for t in 1:T
+            update(l)
+
+            # keep track of the optimal path that would have had highest payoff
+            optimal_line[t] += (best_mean - optimal_line[t]) / j
+
+            for (idx, id) in enumerate(agent_ids)
+                # get reward they just got
+                r = l[RecentAction][id].last_reward
+
+                # update global average for this specific time step 't' remember j is current run number
+                avg_rewards[t, idx] += (r-avg_rewards[t, idx])/ j
+            end
+        end
+    end
+    return avg_rewards, optimal_line
+end
+
+# Define the "Competitors"
+my_strats = [UCB(2.0), EpsilonGreedy(0.1), EpsilonGreedy(0.01), ThompsonSampling()]
+
+# Run the testbed
+results, optimal = run_testbed(my_strats)
+
+println("\n" * "="^30)
+println("FINAL TESTBED SUMMARY")
+println("="^30)
+
+# calculate total number of time steps
+total_steps = size(results, 1)
+
+for i in 1:length(my_strats)
+    strat_name = string(nameof(typeof(my_strats[i])))
+    final_avg = round(results[end, i], digits=3)
+    total_cum = round(sum(results[:, i]), digits=2)
+
+    println("Strategy: $strat_name")
+    println("  - Final Avg Reward: $final_avg")
+    println("  - Total Avg Reward over $total_steps steps: $total_cum")
+    println("-"^30)
+end
+
+# Plotting logic
+p = plot(optimal, label="Optimal (Ceiling)", linestyle=:dash, color=:black)
+for i in 1:length(my_strats)
+    plot!(p, results[:, i], label=string(nameof(typeof(my_strats[i]))))
+end
+
+savefig("bandit_testbed.png")
+println("Plot saved to bandit_results.png")
