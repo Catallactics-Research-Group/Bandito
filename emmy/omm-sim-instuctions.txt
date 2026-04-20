@@ -1,0 +1,42 @@
+
+# Summary: Bandit Model Exploration
+
+This document summarizes the conversation found in `Bandit Model Exploration_otter.ai.txt`, primarily between Tyler and Speaker 1 (a student).
+
+## Flow of the Conversation
+
+1. **Tooling and Scribe Notes (0:00 - 8:00)**
+   - The conversation begins with Tyler discussing workflows for creating lecture notes. He mentions a system from UC Berkeley where students scribe notes.
+   - Tyler demonstrates how he has been using a combination of tools (Markdown, Quarto, and Claude) to convert handwritten notes into formatted LaTeX/PDF documents. He notes the advantages of using AI to handle the tedious aspects of LaTeX formatting.
+   - He suggests that Speaker 1 should use this process (e.g., via the Genius Scan app and a custom Claude skill) to create handwritten and subsequently digitized notes for their sessions.
+
+2. **Connecting Finance and Reinforcement Learning (8:00 - 15:00)**
+   - The focus shifts to the core academic topic: combining bandit models with market making for option pricing.
+   - They discuss bridging financial theory (Shreve's text on the binomial model) with reinforcement learning (Sutton and Barto's text on Markov Decision Processes).
+   - Tyler frames the market maker's action of delta hedging as a form of "Austrian entrepreneurship" within a "catalaxy" (a market order), contrasting it with neoclassical finance where the hedge ratio is a deterministic equilibrium condition.
+
+3. **Formulating the Bandit Model for Market Making (15:00 - 35:00)**
+   - **The Action Space:** In their model, instead of using the Black-Scholes formula to find the exact delta, the market maker has a discrete set of arms (actions), where each arm represents a different hedge ratio.
+   - **The Setup:** The market maker is assumed to be short a call option and needs to hedge this position.
+   - **Utility and Rewards:** They discuss the need for a utility function to evaluate the "wealth" or "profit" from hedging. Tyler mentions using an asymmetric loss function, arguing that market makers care more about avoiding losses than limiting windfall profits.
+   - **Simulation:** The market maker uses their subjective probability beliefs (a posterior predictive distribution) to simulate forward paths of the underlying asset. For each selected action (hedge ratio), they simulate a path to calculate the cumulative reward.
+
+4. **Action Selection and Bounded Rationality (35:00 - 50:00)**
+   - They clarify the logic loop at time `t`:
+     1. The agent has a **predictive model** (beliefs about future prices).
+     2. They have an **action space** (possible hedge ratios).
+     3. They use a **sampling strategy** (like Thompson Sampling or UCB - Upper Confidence Bound) to select an action.
+     4. They simulate *one* path forward using that selected action to see the outcome.
+   - Tyler emphasizes that this approach models **bounded rationality**. Instead of brute-forcing all possible paths and actions (which requires infinite compute), the bandit algorithm acts as an "anytime algorithm," providing a "good enough" decision within computational constraints. It maps well to search theory, where computation itself has a cost.
+
+5. **Next Steps: A Baseline Experiment (50:00 - End)**
+   - To prove out the concept, Tyler proposes a baseline exercise: **Learning the Equilibrium**.
+   - **The Setup:** Assume the underlying world truly follows the binomial model (meaning the equilibrium is known). 
+   - **The Agent:** Place the bandit algorithm into this world. The bandit *knows* the binomial structure but *doesn't* inherently know the equilibrium action (the perfect hedge ratio).
+   - **The Goal:** Run the simulation and see if the bandit algorithm (e.g., UCB) can eventually *learn* the Black-Scholes/binomial optimal hedging strategy over time just by simulating paths and observing rewards.
+   - The session wraps up with a brief discussion on using GARCH models for future, more complex predictive simulations, and confirming that the student will use these concepts to generate notes for their next meeting.
+
+## Key Takeaways
+- **Agentic Hedging:** Delta hedging can be modeled dynamically as a reinforcement learning problem (a contextual bandit) rather than a solved mathematical equation.
+- **Bounded Rationality via Computation:** Using algorithms like Thompson Sampling or UCB introduces computational constraints that mimic bounded rationality in real-world human actors.
+- **Immediate Action Item:** The student is tasked with taking notes on this session and beginning to model the baseline experiment: putting a bandit algorithm inside a binomial tree world to see if it learns the optimal hedge ratio.

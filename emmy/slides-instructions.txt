@@ -1,0 +1,95 @@
+This is a great way to use your "mental sim" as a meta-tool for the presentation itself. Since you are using **Quarto**, you can leverage its ability to mix LaTeX, Julia code, and Markdown.
+
+Below is a template for a `presentation_prompts.md` file. You can feed this to your agent plugin. It is structured to force you to answer those tough Socratic questions that bridge the gap between "I wrote some cool code" and "Here is a contribution to Economic Theory."
+
+---
+
+# Quarto Presentation Architect: Market Maker Bandit Simulation
+
+## Slide 1: The Hook (The "Why")
+**Socratic Question:** If an options market maker didn't exist, why would the market fail? How does your simulation's "Man vs. Nature" setup mirror the real-world tension of providing liquidity under uncertainty?
+* **Instruction:** Generate a title slide. Motivate the agent as a "Walrasian Auctioneer" who has been fired and replaced by a Reinforcement Learning algorithm.
+
+---
+
+## Slide 2: From ODEs to Algorithms
+**Socratic Question:** In class, we solve for Nash Equilibrium using fixed-point theorems. In your sim, the equilibrium isn't *given*; it *emerges*. How do you define "equilibrium" when the agent is constantly learning?
+* **Instruction:** Create a slide titled **"Constructive vs. Analytical Rationality"**. Contrast the "God's eye view" of classical game theory with the "Agent's eye view" of your simulation.
+
+---
+
+## Slide 3: The Game Against Nature
+**Socratic Question:** Is Nature a strategic opponent or just a stochastic process? If Nature "plays" a Geometric Brownian Motion, what is the agent's **Best Response Function**? 
+* **Instruction:** Use a diagram tag here: ``. Explicitly link your `pick_a_delta()` function to the concept of a **Statistical Decision Rule** (Wald, 1950).
+
+---
+
+## Slide 4: The Agent's Mind (The Mental Sim)
+**Socratic Question:** Why does the agent need a "mental sim" instead of just looking at a formula? How does this represent **Bounded Rationality** (Simon) or **Subjective Expected Utility** (Savage)?
+* **Instruction:** Explain the **Thompson Sampling** logic. Use LaTeX to show the transition from the Beta Prior to the Posterior belief about market direction.
+* **Formula Hint:** $\alpha_{t+1} = \alpha_t + \mathbb{1}_{\{S_{t+1} > S_t\}}$
+
+---
+
+## Slide 5: The "Black-Scholes" Tension
+**Socratic Question:** Your agent is "bad" at being a Black-Scholes hedger. Is that a bug in the code, or a feature of reality? Is a "Risk-Neutral" hedge even possible for an agent with finite computing power and a discrete choice set?
+* **Instruction:** Present the "Mismatch" as a discovery. Contrast **Dynamic Hedging** (the theory) with **Static/Bandit Hedging** (your simulation).
+
+---
+
+## Slide 6: Results & The "So What?"
+**Socratic Question:** Looking at your `delta_comparison.png`, what does the "Average distance from True BS Delta" actually tell us about the cost of learning? 
+* **Instruction:** Create a slide for "Emergent Behaviors." Discuss whether the agent is **Speculating** (chasing drift) or **Hedging** (minimizing variance).
+
+---
+
+## Slide 7: Future Directions (Nested Simulations)
+**Socratic Question:** If you gave the agent the ability to "re-hedge" inside its own mind (nested loops), would it finally discover the Black-Scholes identity? Or is the search space too large for a lone bandit?
+* **Instruction:** Final slide on "The Horizon." Connect back to **Agent-based Computational Economics (ACE)**.
+
+---
+
+### Pro-Tip for your Agent Plugin:
+If your plugin supports it, tell it: *"Use the `Julia` engine for Quarto to pull in the final summary metrics from my `run_simulation()` output directly into the slides."*
+
+Does this structure help you see the "Story" of your research
+
+
+More notes: 
+
+Gap we're trying to fill: high fidelity Bayesian agent who uses monte carlo "mental model" simulation to evaluate expected utility of a hedge ratio. Explores through thompson sampling. Trying to model a market maker's decision making process and see what emerges. 
+
+Motivating literature:
+- Buchanan (2001) on game theory, mathematics, and economics: the emergent properties of voluntary exchange -- its about the rules that govern interactions and outcomes that emerge from interdepndent choices, not just individual maximization. Focusing on the rules of the game, not just individual outcomes.  
+- Testfastion 2017 -- Modeling economic systems as locally constructive sequential games: all actions are based on local states, actions can affect future local states. Doesn't depend on determination or existence of equilibrium states, but can see it emerge. Uses the structure of sequential games, the rules and the context. 
+- Giocoli(2013) quoting Wald -- statistical decision problems as a 2 person game vs. nature. 
+
+- Our simulation has two actors: the options market maker vs. nature. The omm takes actions at each step based on "actions" taken by the market, based on the local state. 
+
+Related Bandit-based hedging and market making lit: 
+- Huo and Fu (2017): Risk-aware multi-armed bandit problem with application to portfolio selection
+- Cannelli et al (2023): Hedging using reinforcment learning: Contextual k-armed bandit versus Q-learning. Using k-armed bandit model to hedge. 
+- Pippas, Turkay, Ludvig (2019/2023): The Evolution of Reinforcment Learning in Quantitative Finance: A Survey
+- Vittori (2021): Augmenting Traders with Learning Machines - RL for dynamic portfolio construction and rebalancing
+- Huang (2025): Tests multiple bandit strategies for find the best bid-ask spread for over the counter market maker. 
+- Zhu et al (2019): Adaptive Portfolio by Solving Multi-armed Bandit via Thompson Sampling. Present bandit models and thompson sampling strategy for making optimal portfolio investment choices. 
+
+Papers in the same spirit: 
+- Figlewski(1989): Options Arbitrage in Imperfect Markets. Simulates impact of arbitrage trade in imperfect markets. Points out gaps between theoretical models and reality may cause market makers to adopt different strategies. 
+- Brock, Lakonishok, Lebaron (1992): Simple Technical Trading Rules and the Stochastic Properties of Stock Returns. Tested trading strategies like moving average and trading range breakout using bootstrap techniques 
+- Geweke & Amisano (2011): Hierarchical Markov Normal Mixture Models with Applications to Financial Asset Returns. Special cool model, use it to construct predictive distributions for stock returns. 
+
+- Look into modeling choice space as continuous instead of discrete. 
+- modify the internal simulation to optimize for a dynamic hedge, rather than simulating the expected value from holding the chosen hedge until expiration
+- 
+
+*Key things that need to happen in the slides*
+- Explain option market maker problem very clearly, what their goal is and how they are going to solve it
+- motivate the connection to game theory, how its connected, why we care, what the gap we're filling is
+- explain thompson sampling strat
+- explain mental sim
+- explain differences between black scholes delta hedge calculation and what the agent is doing
+
+- agent is a bayesian decision-maker facing a statistical decision problem - they are choosing a specific action to maximize utility/ min loss
+
+
